@@ -1,0 +1,11 @@
+import os
+
+DEFAULT_STREAM_URL = "rtsp://localhost:8554/"
+STREAM_URL = os.environ.get("STREAM_URL", DEFAULT_STREAM_URL)
+
+
+DEFAULT_MEDIA_DIRECTORY = "../_media/"
+MEDIA_DIRECTORY = os.environ.get("MEDIA_DIRECTORY", DEFAULT_MEDIA_DIRECTORY)
+
+API_VERSION = "0.0.1"
+

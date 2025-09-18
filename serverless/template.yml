@@ -1,0 +1,54 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: "Serverless functions for user management"
+
+Resources:
+  GreetUserFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: lambdas/greet_user/
+      Handler: greet_user.lambda_handler
+      Runtime: python3.9
+      Events:
+        GreetUserApi:
+          Type: Api
+          Properties:
+            Path: /greet
+            Method: post
+
+  AddUserFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: lambdas/add_user/
+      Handler: add_user.lambda_handler
+      Runtime: python3.9
+      Events:
+        AddUserApi:
+          Type: Api
+          Properties:
+            Path: /add
+            Method: post
+
+  DeleteUserFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: lambdas/delete_user/
+      Handler: delete_user.lambda_handler
+      Runtime: python3.9
+      Events:
+        DeleteUserApi:
+          Type: Api
+          Properties:
+            Path: /delete
+            Method: post
+
+Outputs:
+  GreetUserApiUrl:
+    Description: "Greet User URL"
+    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/greet"
+  AddUserApiUrl:
+    Description: "Add User URL"
+    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/add"
+  DeleteUserApiUrl:
+    Description: "Delete User URL"
+    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/delete"

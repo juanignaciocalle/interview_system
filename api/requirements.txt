@@ -1,0 +1,8 @@
+fastapi[all]>=0.102, <0.103
+opencv-python==4.7.0.72
+pymongo==3.12.3
+mongoengine>=0.24, < 0.25
+requests
+python-jose
+pyyaml==6.0.2
+passlib
