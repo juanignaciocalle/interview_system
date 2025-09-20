@@ -36,7 +36,7 @@ pipeline {
                                 if [ -d /home/app-user/project/.git ]; then
                                     cd /home/app-user/project && git pull;
                                 else
-                                    git clone git@github.com:juanignaciocalle/interview_system.git /home/app-user/project;
+                                    git clone https://github.com/juanignaciocalle/interview_system /home/app-user/project;
                                 fi
                             '
                         '''
