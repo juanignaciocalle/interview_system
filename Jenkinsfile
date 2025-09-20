@@ -4,6 +4,7 @@ pipeline {
     agent any
 
     stages {
+        // comment for testing
         // Stage 1: Checkout the code from GitHub
         // This stage is mostly for confirmation, as Jenkins has already
         // checked out the code to find this Jenkinsfile.
