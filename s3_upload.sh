@@ -1,0 +1,2 @@
+
+curl -X PUT -T test-cl2.png "http://localhost:4566/local-avatar-bucket/avatars/68cdf1d70740197a824e74bd.jpg?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=defaultkey%2F20250920%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20250920T141653Z&X-Amz-Expires=3600&X-Amz-SignedHeaders=content-type%3Bhost&X-Amz-Signature=ade7214a6fbfacaa2700924e87a6b8afb1373dab49f28308572df9f84b3c6882"

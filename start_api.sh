@@ -1,0 +1,1 @@
+sam local start-api --env-vars env-local.json --docker-network shared_local_network

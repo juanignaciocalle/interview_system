@@ -1,0 +1,1 @@
+awslocal s3 cp s3://local-avatar-bucket/avatars/68cdf1d70740197a824e74bd.jpg test.jpg

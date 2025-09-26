@@ -1,0 +1,4 @@
+debugpy==1.8.1
+aws-sam-cli==1.113.0
+cfn-lint==0.86.1
+pytest==8.1.1

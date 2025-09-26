@@ -1,0 +1,149 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  API para la gestión de usuarios con subida de avatares a S3.
+
+# Parámetros que puedes cambiar en cada despliegue (ej. para dev vs prod)
+Parameters:
+  MongoUri:
+    Type: String
+    Description: La URI de conexión para MongoDB (incluyendo usuario/contraseña). ¡Usa AWS Secrets Manager en producción!
+  VpcId:
+    Type: AWS::EC2::VPC::Id
+    Description: El ID de la VPC donde está tu EC2 con MongoDB.
+  SubnetIds:
+    Type: List<AWS::EC2::Subnet::Id>
+    Description: Una lista de IDs de subnets privadas para las Lambdas.
+  MongoSecurityGroupId:
+    Type: AWS::EC2::SecurityGroup::Id
+    Description: El ID del Security Group asignado a tus Lambdas para acceder a la EC2.
+
+# Configuraciones globales para todas las funciones
+Globals:
+  Function:
+    Timeout: 10
+    MemorySize: 128
+    Runtime: python3.12
+    # Conecta TODAS las funciones a la VPC para que puedan ver la EC2
+    VpcConfig:
+      SecurityGroupIds:
+        - !Ref MongoSecurityGroupId
+      SubnetIds: !Ref SubnetIds
+    # Pasa la URI de Mongo como una variable de entorno segura
+    Environment:
+      Variables:
+        MONGO_URI: !Ref MongoUri
+        AVATAR_BUCKET_NAME: !Ref AvatarBucket
+
+Resources:
+  # 1. El Bucket S3 para los avatares
+  AvatarBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      # Bloquea el acceso público por defecto, la seguridad se gestiona con URLs prefirmadas
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
+      # ¡IMPORTANTE! Permite que el navegador suba archivos desde tu dominio web
+      CorsConfiguration:
+        CorsRules:
+          - AllowedHeaders: ["*"]
+            AllowedMethods: ["PUT", "POST", "GET"]
+            AllowedOrigins: ["*"] # Cámbialo por el dominio de tu frontend en producción
+            MaxAge: 3000
+
+  # 2. La API Gateway HTTP que actuará como punto de entrada
+  UsersApi:
+    Type: AWS::Serverless::HttpApi
+
+  # 3. Las Funciones Lambda
+  CreateUserFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/create_user/
+      Handler: app.handler
+      Events:
+        CreateUser:
+          Type: Api
+          Properties:
+            Path: /users
+            Method: post
+            ApiId: !Ref UsersApi
+
+  GetUserFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/get_user/
+      Handler: app.handler
+      Events:
+        GetUser:
+          Type: Api
+          Properties:
+            Path: /users/{userId}
+            Method: get
+            ApiId: !Ref UsersApi
+  
+  UpdateUserFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/update_user/
+      Handler: app.handler
+      Events:
+        UpdateUser:
+          Type: Api
+          Properties:
+            Path: /users/{userId}
+            Method: put
+            ApiId: !Ref UsersApi
+
+  DeleteUserFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/delete_user/
+      Handler: app.handler
+      Events:
+        DeleteUser:
+          Type: Api
+          Properties:
+            Path: /users/{userId}
+            Method: delete
+            ApiId: !Ref UsersApi
+
+  GenerateAvatarUrlFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/generate_avatar_url/
+      Handler: app.handler
+      Policies:
+        # ¡Permiso clave! Esta Lambda necesita permiso para generar la URL de subida para S3.
+        - S3PutObjectPolicy:
+            BucketName: !Ref AvatarBucket
+      Events:
+        GenerateUrl:
+          Type: Api
+          Properties:
+            Path: /users/{userId}/avatar
+            Method: post
+            ApiId: !Ref UsersApi
+
+  HelloWorldFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/hello_world/
+      Handler: app.handler
+      # ¡Importante! No le ponemos VpcConfig ni Environment. Es totalmente independiente.
+      Events:
+        HelloWorld:
+          Type: Api
+          Properties:
+            Path: /hello
+            Method: get
+            ApiId: !Ref UsersApi
+
+Outputs:
+  # Muestra la URL de la API después de desplegar
+  ApiEndpoint:
+    Description: "URL del endpoint de la API"
+    Value: !Sub "https://{ServerlessHttpApi}.execute-api.${AWS::Region}.amazonaws.com"

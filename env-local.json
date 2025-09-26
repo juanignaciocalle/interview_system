@@ -1,0 +1,22 @@
+{
+  "CreateUserFunction": {
+    "MONGO_URI": "mongodb://mongodb:27017/",
+    "AVATAR_BUCKET_NAME": "local-avatar-bucket"
+  },
+  "GetUserFunction": {
+    "MONGO_URI": "mongodb://mongodb:27017/"
+  },
+  "UpdateUserFunction": {
+    "MONGO_URI": "mongodb://mongodb:27017/"
+  },
+  "DeleteUserFunction": {
+    "MONGO_URI": "mongodb://mongodb:27017/"
+  },
+  "GenerateAvatarUrlFunction": {
+    "AVATAR_BUCKET_NAME": "local-avatar-bucket",
+    "S3_ENDPOINT": "http://localhost:4566",
+    "AWS_ACCESS_KEY_ID": "test",
+    "AWS_SECRET_ACCESS_KEY": "test",
+    "AWS_REGION": "us-east-1"
+  }
+}
