@@ -22,7 +22,7 @@ pipeline {
                         sh """
                             ssh ${remoteUser}@${remoteHost} '
                                 # The target directory on your PC for the project
-                                def projectDir = "/home/juan/project"
+                                def projectDir = "./home/juan/repos/proyectos/interview_system/test"
 
                                 if [ -d \${projectDir}/.git ]; then
                                     echo "--- Directory exists, pulling changes ---"
