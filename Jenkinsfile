@@ -13,7 +13,7 @@ pipeline {
                         // Your specific user and host details
                         def remoteUser = "juan"
                         // IMPORTANT: Double-check this is still your correct IP address!
-                        def remoteHost = "192.168.1.15"
+                        def remoteHost = "192.168.1.2"
 
                         // Add your PC's SSH key fingerprint to known_hosts
                         sh "ssh-keyscan ${remoteHost} >> ~/.ssh/known_hosts"
