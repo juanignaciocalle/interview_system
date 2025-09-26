@@ -7,22 +7,19 @@ pipeline {
         // This stage block was missing
         stage('Deploy via SSH to Local PC') {
             steps {
-                // Use the credentials you created with the ID 'remote-host-creds'
-                sshagent(credentials: ['remote-host-creds-2']) {
+                sshagent(credentials: ['remote-host-creds']) { // Or whatever your final credential ID is
                     script {
-                        // Your specific user and host details
                         def remoteUser = "juan"
-                        // IMPORTANT: Double-check this is still your correct IP address!
                         def remoteHost = "192.168.1.2"
 
-                        // Add your PC's SSH key fingerprint to known_hosts
                         sh "ssh-keyscan ${remoteHost} >> ~/.ssh/known_hosts"
 
                         // The deployment script
                         sh """
                             ssh ${remoteUser}@${remoteHost} '
                                 # The target directory on your PC for the project
-                                def projectDir = "./home/juan/repos/proyectos/interview_system/test"
+                                # THIS LINE IS NOW CORRECT BASH SYNTAX
+                                projectDir="/home/juan/project"
 
                                 if [ -d \${projectDir}/.git ]; then
                                     echo "--- Directory exists, pulling changes ---"
