@@ -4,39 +4,32 @@ pipeline {
     agent any
 
     stages {
-        // comment for testing
-        // Stage 1: Checkout the code from GitHub
-        // This stage is mostly for confirmation, as Jenkins has already
-        // checked out the code to find this Jenkinsfile.
-        stage('Checkout') {
-            steps {
-                checkout scm
-            }
-        }
+        steps {
+            // Use the credentials you created with the ID 'remote-host-creds'
+            sshagent(credentials: ['remote-host-creds']) {
+                script {
+                    // Your specific user and host details
+                    def remoteUser = "juan"
+                    def remoteHost = "192.168.1.15"  // <-- REPLACE THIS WITH YOUR IP ADDRESS
 
-        // Stage 2: Deploy the code to the remote host
-        stage('Deploy via SSH') {
-            steps {
-                // Use the credentials you created with the ID 'remote-host-creds'
-                sshagent(credentials: ['remote-host-creds']) {
-                    script {
-                        // FIX: Create the .ssh directory if it doesn't exist
-                        sh 'mkdir -p ~/.ssh'
+                    // Add your PC's SSH key fingerprint to known_hosts
+                    sh "ssh-keyscan ${remoteHost} >> ~/.ssh/known_hosts"
 
-                        // This command will now succeed because the directory exists
-                        sh 'ssh-keyscan remote_host >> ~/.ssh/known_hosts'
+                    // The deployment script
+                    sh """
+                        ssh ${remoteUser}@${remoteHost} '
+                            # The target directory on your PC for the project
+                            def projectDir = "/home/juan/project"
 
-                        // The rest of your script remains the same
-                        sh '''
-                            ssh app-user@remote_host '
-                                if [ -d /home/app-user/project/.git ]; then
-                                    cd /home/app-user/project && git pull;
-                                else
-                                    git clone https://github.com/juanignaciocalle/interview_system /home/app-user/project;
-                                fi
-                            '
-                        '''
-                    }
+                            if [ -d \${projectDir}/.git ]; then
+                                echo "--- Directory exists, pulling changes ---"
+                                cd \${projectDir} && git pull;
+                            else
+                                echo "--- Directory does not exist, cloning repository ---"
+                                mkdir -p \${projectDir} && git clone https://github.com/juanignaciocalle/interview_system \${projectDir};
+                            fi
+                        '
+                    """
                 }
             }
         }
