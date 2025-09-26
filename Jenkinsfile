@@ -8,7 +8,7 @@ pipeline {
         stage('Deploy via SSH to Local PC') {
             steps {
                 // Use the credentials you created with the ID 'remote-host-creds'
-                sshagent(credentials: ['remote-host-creds']) {
+                sshagent(credentials: ['remote-host-creds-2']) {
                     script {
                         // Your specific user and host details
                         def remoteUser = "juan"
